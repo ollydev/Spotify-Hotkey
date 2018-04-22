@@ -223,15 +223,24 @@ begin
       if FAILED(simpleAudio.GetMasterVolume(volumeLevel)) then
         raise Exception.Create('FAILED getting volumeLevel');
 
-      volumeLevel += Delta;
-      if (volumeLevel - Delta < 0) then
-        volumeLevel := 0;
-      if (volumeLevel + Delta > 1) then
-        volumeLevel := 1;
+      if (volumeLevel + Delta < 0) then
+      begin
+        if (volumeLevel = 0) then
+          Exit(True);
 
-      if (volumeLevel > 0) and (volumeLevel < 1) then
-        if FAILED(simpleAudio.SetMasterVolume(volumeLevel, nil)) then
-          raise Exception.Create('FAILED setting volumeLevel');
+        volumeLevel := 0;
+      end else
+      if (volumeLevel + Delta > 1) then
+      begin
+        if (volumeLevel = 1) then
+          Exit(True);
+
+        volumeLevel := 1;
+      end else
+        volumeLevel += Delta;
+
+      if FAILED(simpleAudio.SetMasterVolume(volumeLevel, nil)) then
+        raise Exception.Create('FAILED setting volumeLevel');
 
       Exit(True);
     end;
